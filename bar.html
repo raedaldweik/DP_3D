@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>3D Column Chart with SAS VA Integration</title>
+  <!-- Include AnyChart CSS -->
+  <link rel="stylesheet" href="https://cdn.anychart.com/releases/v8/css/anychart-ui.min.css">
+  <link rel="stylesheet" href="https://cdn.anychart.com/releases/v8/fonts/css/anychart-font.min.css">
+  <style>
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background-color: #2B2B2B; /* Match chart background */
+    }
+    #container {
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      position: relative;
+      margin: auto;
+    }
+    #overlay {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 100%;
+      height: 15%;
+      background-color: #2B2B2B; /* Match chart background */
+      z-index: 10; /* Ensure it overlays the chart */
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <!-- Overlay to hide the watermark -->
+    <div id="overlay"></div>
+  </div>
+  <!-- Include AnyChart Libraries -->
+  <script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js"></script>
+  <script src="https://cdn.anychart.com/releases/v8/js/anychart-cartesian-3d.min.js"></script>
+  <script src="https://cdn.anychart.com/releases/v8/js/anychart-ui.min.js"></script>
+  <script src="https://cdn.anychart.com/releases/v8/js/anychart-exports.min.js"></script>
+  <!-- Include AnyChart Theme (Optional) -->
+  <script src="https://cdn.anychart.com/releases/v8/themes/light_blue.min.js"></script>
+  <script>
+    // Declare the chart variable globally
+    var chart;
+
+    // Function to draw or update the chart
+    function drawOrUpdateChart(chartData) {
+      if (!chart) {
+        // Set chart theme (optional)
+        anychart.theme('lightBlue');
+
+        // Create the chart instance once
+        chart = anychart.column3d();
+
+        // Turn on chart animation
+        chart.animation(true);
+
+        // Set chart title
+        chart.title('التكرار حسب التصنيف'); // "Frequency by Classification"
+        chart.title().fontColor('#FFFFFF'); // Make title white
+
+        // Enable tooltips
+        chart.tooltip()
+          .position('center-top')
+          .anchor('center-bottom')
+          .offsetX(0)
+          .offsetY(5)
+          .format('{%Value}'); // Adjust the format as needed
+
+        // Set scale minimum
+        chart.yScale().minimum(0);
+
+        // Set yAxis labels formatter
+        chart.yAxis().labels().format('{%Value}{groupsSeparator: }');
+        chart.yAxis().labels().fontColor('#FFFFFF'); // Y-axis labels white
+
+        // Configure interactivity
+        chart.tooltip().positionMode('point');
+        chart.interactivity().hoverMode('by-x');
+
+        // Set axis titles
+        chart.xAxis().title('التصنيف'); // "Classification"
+        chart.yAxis().title('Frequency');
+
+        // Make axis titles white
+        chart.xAxis().title().fontColor('#FFFFFF');
+        chart.yAxis().title().fontColor('#FFFFFF');
+
+        // Make axis labels white
+        chart.xAxis().labels().fontColor('#FFFFFF');
+
+        // Remove grid lines
+        chart.xGrid().enabled(false);
+        chart.yGrid().enabled(false);
+        chart.yMinorGrid().enabled(false);
+
+        // Set background color
+        chart.background().fill('#2B2B2B'); // Set background color to match
+
+        // Make axis strokes white (if needed)
+        chart.xAxis().stroke('#FFFFFF');
+        chart.yAxis().stroke('#FFFFFF');
+        chart.xAxis().ticks().stroke('#FFFFFF');
+        chart.yAxis().ticks().stroke('#FFFFFF');
+
+        // Set container id for the chart
+        chart.container('container');
+      }
+
+      // Remove existing data
+      chart.removeAllSeries();
+
+      // Add new data as a series
+      var series = chart.column(chartData);
+
+      // Set bar color
+      series.normal().fill('#FFB461').stroke(null);
+
+      // Draw or update the chart
+      chart.draw();
+    }
+
+    // Function to process data from SAS VA
+    function onMessage(evt) {
+      console.log("[ddc] onMessage triggered");
+      console.log("[ddc] evt.data:", evt.data);
+
+      let sasData = evt.data;
+
+      // Check if data is received
+      if (!sasData || !sasData.data || sasData.data.length === 0) {
+        console.warn("No data received from SAS VA or data is in incorrect format.");
+        // Draw chart with default data
+        drawOrUpdateChart([
+          ['No Data', 0]
+        ]);
+        return;
+      }
+
+      let data = sasData.data;
+
+      // Assuming variables are assigned in this order:
+      // Index 0: 'التصنيف' (Classification)
+      // Index 1: 'Frequency'
+
+      let categoryIndex = 0;
+      let measureIndex = 1;
+
+      // Prepare data for the chart
+      let chartData = data.map(row => [
+        row[categoryIndex] || 'No Data',
+        parseFloat(row[measureIndex]) || 0
+      ]);
+
+      console.log("[ddc] chartData:", chartData);
+
+      // Draw or update the chart
+      drawOrUpdateChart(chartData);
+    }
+
+    // Listen for messages from SAS VA
+    if (window.addEventListener) {
+      window.addEventListener("message", onMessage, false);
+    } else {
+      window.attachEvent("onmessage", onMessage);
+    }
+
+    // For testing purposes: Draw chart with default data if no data is received after a delay
+    setTimeout(function() {
+      if (typeof anychart !== 'undefined' && !document.querySelector('#container svg')) {
+        console.log("[ddc] No data received, drawing chart with default data for testing.");
+        let defaultData = [
+          ['Category A', 100],
+          ['Category B', 200],
+          ['Category C', 150]
+        ];
+        drawOrUpdateChart(defaultData);
+      }
+    }, 2000); // Adjust the delay as needed
+  </script>
+</body>
+</html>

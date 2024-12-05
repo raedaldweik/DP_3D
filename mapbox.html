@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mapbox with SAS VA Integration</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <!-- Include Mapbox CSS and JS -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.css" rel="stylesheet">
+    <style>
+        /* Styles */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+        /* Re-center Button Styles */
+        #recenter-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            background-color: #007AFF;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: Arial, sans-serif;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        #recenter-button:hover {
+            background-color: #005BB5;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <button id="recenter-button">Re-center</button>
+
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoicmFlZGR3ZWlrIiwiYSI6ImNtMTZqZGtpeTBta2cydnM4NjBkenhsMG8ifQ.r3ufHWJMoGh_DCH3XDhDAg'; // Replace with your Mapbox access token
+
+        // Initial map view settings
+        const initialView = {
+            center: [55.31766174258172, 25.222533164422202], // Initial center
+            zoom: 11.6, // Initial zoom level
+            pitch: 13.2, // Initial pitch
+            bearing: -36.6 // Initial bearing
+        };
+
+        // Create the map
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/raeddweik/cm49q70nu00lx01sa0ayzg7cm',
+            ...initialView
+        });
+
+        map.on('load', () => {
+            const layerId = 'crime-location-sas-f9mg324-0b1xj7'; // Layer ID from your Mapbox Studio
+
+            // Add click event listener for the layer
+            map.on('click', layerId, (e) => {
+                if (e.features.length) {
+                    const feature = e.features[0];
+                    const coordinates = feature.geometry.coordinates.slice();
+                    const properties = feature.properties;
+
+                    // Smoothly zoom to the clicked point
+                    map.flyTo({
+                        center: coordinates,
+                        zoom: 15, // Adjust the zoom level as needed
+                        essential: true
+                    });
+
+                    // Create a popup
+                    new mapboxgl.Popup()
+                        .setLngLat(coordinates)
+                        .setHTML(`
+                            <h3>Metadata</h3>
+                            <p><strong>Reporting Station:</strong> ${properties.reporting_station || 'N/A'}</p>
+                            <p><strong>Crime Type:</strong> ${properties.crime_type || 'N/A'}</p>
+                            <p><strong>Description:</strong> ${properties.description || 'N/A'}</p>
+                        `)
+                        .addTo(map);
+                }
+            });
+
+            // Change cursor to pointer on hover
+            map.on('mouseenter', layerId, () => {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+
+            // Reset cursor when leaving the layer
+            map.on('mouseleave', layerId, () => {
+                map.getCanvas().style.cursor = '';
+            });
+        });
+
+        // Re-center button functionality
+        const recenterButton = document.getElementById('recenter-button');
+        recenterButton.addEventListener('click', () => {
+            map.flyTo({
+                center: initialView.center,
+                zoom: initialView.zoom,
+                pitch: initialView.pitch,
+                bearing: initialView.bearing,
+                essential: true
+            });
+        });
+
+        // Mapping of reporting stations to their locations
+        const reportingStations = {
+            'مركز الشرطة 1': {
+                center: [55.3300, 25.2600],
+                zoom: 15,
+                pitch: 0,
+                bearing: 0
+            },
+            'مركز الشرطة 2': {
+                center: [55.3400, 25.2700],
+                zoom: 15,
+                pitch: 0,
+                bearing: 0
+            },
+            'مركز الشرطة 3': {
+                center: [55.3500, 25.2800],
+                zoom: 15,
+                pitch: 0,
+                bearing: 0
+            },
+            // Add entries for other stations...
+            'مركز الشرطة 4': {
+                center: [55.3600, 25.2900],
+                zoom: 15,
+                pitch: 0,
+                bearing: 0
+            },
+            'مركز الشرطة 5': {
+                center: [55.3700, 25.3000],
+                zoom: 15,
+                pitch: 0,
+                bearing: 0
+            },
+            'مركز الشرطة 6': {
+                center: [55.3800, 25.3100],
+                zoom: 15,
+                pitch: 0,
+                bearing: 0
+            },
+            'مركز الشرطة 7': {
+                center: [55.3900, 25.3200],
+                zoom: 15,
+                pitch: 0,
+                bearing: 0
+            },
+            'مركز الشرطة 8': {
+                center: [55.4000, 25.3300],
+                zoom: 15,
+                pitch: 0,
+                bearing: 0
+            },
+            'مركز الشرطة 9': {
+                center: [55.4100, 25.3400],
+                zoom: 15,
+                pitch: 0,
+                bearing: 0
+            },
+            'مركز الشرطة 10': {
+                center: [55.4200, 25.3500],
+                zoom: 15,
+                pitch: 0,
+                bearing: 0
+            },
+            'مركز الشرطة 11': {
+                center: [55.4300, 25.3600],
+                zoom: 15,
+                pitch: 0,
+                bearing: 0
+            },
+            'مركز الشرطة 12': {
+                center: [55.4400, 25.3700],
+                zoom: 15,
+                pitch: 0,
+                bearing: 0
+            }
+        };
+
+        // Function to fly to a reporting station
+        function flyToStation(stationName) {
+            const station = reportingStations[stationName];
+            if (station) {
+                map.flyTo({
+                    center: station.center,
+                    zoom: station.zoom,
+                    pitch: station.pitch,
+                    bearing: station.bearing,
+                    essential: true
+                });
+            } else {
+                console.warn(`Station "${stationName}" not found. Flying to default view.`);
+                flyToDefaultView();
+            }
+        }
+
+        // Function to fly to the default view
+        function flyToDefaultView() {
+            map.flyTo({
+                center: initialView.center,
+                zoom: initialView.zoom,
+                pitch: initialView.pitch,
+                bearing: initialView.bearing,
+                essential: true
+            });
+        }
+
+        /**
+         * Executed when a message is received from SAS VA
+         * @param evt {Event}
+         */
+        function onMessage(evt) {
+            console.log("[ddc] onMessage", evt.data);
+
+            let data = evt?.data?.data;
+
+            if (!data || !Array.isArray(data) || data.length === 0 || !data[0]) {
+                console.log("[ddc] No selection or invalid data, flying to default view");
+                flyToDefaultView();
+                return;
+            }
+
+            const columnIndex = 0; // Assuming 'مركز الشرطة' is the first variable
+            const stationValues = data.map((values) => values[columnIndex]);
+
+            console.log("[ddc] stationValues:", stationValues);
+
+            if (stationValues && stationValues.length === 1 && stationValues[0]) {
+                const stationName = stationValues[0];
+                flyToStation(stationName);
+            } else {
+                console.warn("Please select a single station or valid data not received, flying to default view.");
+                flyToDefaultView();
+            }
+        }
+
+        // Listen for messages from SAS VA
+        if (window.addEventListener) {
+            window.addEventListener("message", onMessage, false);
+        } else {
+            window.attachEvent("onmessage", onMessage);
+        }
+    </script>
+</body>
+</html>

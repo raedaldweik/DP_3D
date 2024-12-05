@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>3D Line Chart - Overlapping Lines Visible</title>
+  <!-- Include AnyChart Libraries -->
+  <script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js"></script>
+  <script src="https://cdn.anychart.com/releases/v8/js/anychart-cartesian-3d.min.js"></script>
+  <script src="https://cdn.anychart.com/releases/v8/js/anychart-ui.min.js"></script>
+  <script src="https://cdn.anychart.com/releases/v8/js/anychart-exports.min.js"></script>
+  <!-- Optional Theme -->
+  <script src="https://cdn.anychart.com/releases/v8/themes/light_blue.min.js"></script>
+  <link href="https://cdn.anychart.com/releases/v8/css/anychart-ui.min.css" rel="stylesheet">
+  <link href="https://cdn.anychart.com/releases/v8/fonts/css/anychart-font.min.css" rel="stylesheet">
+  <style>
+    html, body, #container {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background-color: #2B2B2B; /* Dark background */
+    }
+    #overlay {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 100%;
+      height: 15%;
+      background-color: #2B2B2B; /* Match chart background */
+      z-index: 10; /* Ensure it overlays the chart to hide watermark */
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <!-- Overlay to hide the watermark -->
+    <div id="overlay"></div>
+  </div>
+
+  <script>
+    var chart;
+
+    function drawOrUpdateChart(seriesData, uniqueGroups) {
+      if (!chart) {
+        anychart.theme('lightBlue');
+
+        chart = anychart.line3d();
+        chart.animation(true);
+
+        // Set titles and axes
+        chart.title('فارق الوقت حسب تاريخ البلاغ ويوم الأسبوع'); // "Time Difference by Report Date and Day of the Week"
+        chart.title().fontColor('#FFFFFF'); // Chart title in white
+
+        chart.yAxis().title('فارق الوقت'); // "Time Difference"
+        chart.xAxis().title('تاريخ البلاغ'); // "Report Date"
+
+        // Make axis titles white
+        chart.xAxis().title().fontColor('#FFFFFF');
+        chart.yAxis().title().fontColor('#FFFFFF');
+
+        // Date-time scale
+        chart.xScale(anychart.scales.dateTime());
+
+        // Legend
+        chart.legend().enabled(true).fontSize(13).padding([0, 0, 20, 0]);
+        // Make legend text white as well
+        chart.legend().fontColor('#FFFFFF');
+
+        // 3D settings
+        chart.zDistribution(true);
+        chart.zAngle(0);
+        chart.zAspect('100%');
+
+        // Interactivity and tooltips
+        chart.interactivity().hoverMode('by-x');
+        chart.tooltip().displayMode('union');
+        chart.tooltip().format(function() {
+          var date = anychart.format.dateTime(this.x, 'dd MMM yyyy');
+          return 'التاريخ: ' + date + '\n' + this.seriesName + ': ' + this.value;
+        });
+
+        // Background and grid
+        chart.background().fill('#2B2B2B');
+        chart.xGrid().enabled(false);
+        chart.yGrid().enabled(false);
+        chart.yMinorGrid().enabled(false);
+
+        // Axis labels white
+        chart.xAxis().labels().fontColor('#FFFFFF');
+        chart.yAxis().labels().fontColor('#FFFFFF');
+
+        // Axis strokes and ticks white
+        chart.xAxis().stroke('#FFFFFF');
+        chart.yAxis().stroke('#FFFFFF');
+        chart.xAxis().ticks().stroke('#FFFFFF');
+        chart.yAxis().ticks().stroke('#FFFFFF');
+
+        // Set container
+        chart.container('container');
+      }
+
+      // Remove old series
+      chart.removeAllSeries();
+
+      // Assign distinct colors and thickness to each line
+      var colors = ['#FF5733', '#33FF57', '#3357FF', '#FF33A6', '#FFC300', '#581845', '#DAF7A6'];
+
+      uniqueGroups.forEach(function(group, index) {
+        var data = seriesData[group];
+        var series = chart.line(data);
+        series.name(group);
+
+        var chosenColor = colors[index % colors.length];
+        // Set visible stroke
+        series.stroke({ color: chosenColor, thickness: 3, opacity: 0.9 });
+      });
+
+      chart.draw();
+    }
+
+    function onMessage(evt) {
+      console.log("[ddc] onMessage triggered");
+      console.log("[ddc] evt.data:", evt.data);
+
+      let sasData = evt.data;
+
+      if (!sasData || !sasData.data || sasData.data.length === 0) {
+        console.warn("No data received, drawing default data");
+        drawOrUpdateChart({}, []);
+        return;
+      }
+
+      let data = sasData.data;
+
+      // Variables:
+      // 0: 'تاريخ البلاغ' (Report Date)
+      // 1: 'فارق الوقت' (Time Difference)
+      // 2: 'يوم الأسبوع' (Day of the Week)
+      let dateIndex = 0;
+      let timeDiffIndex = 1;
+      let dayOfWeekIndex = 2;
+
+      let seriesData = {};
+      let uniqueGroups = [];
+
+      data.forEach(row => {
+        let dateStr = row[dateIndex];
+        let date = new Date(dateStr);
+        if (isNaN(date)) {
+          console.warn("Invalid date format:", dateStr);
+          return; // skip invalid date
+        }
+        let timeDiff = parseFloat(row[timeDiffIndex]) || 0;
+        let group = row[dayOfWeekIndex] || 'No Day';
+
+        if (!uniqueGroups.includes(group)) {
+          uniqueGroups.push(group);
+          seriesData[group] = [];
+        }
+
+        seriesData[group].push({ x: date.getTime(), value: timeDiff });
+      });
+
+      // Sort data by date for each group
+      uniqueGroups.forEach(group => {
+        seriesData[group].sort(function(a, b) {
+          return a.x - b.x;
+        });
+      });
+
+      console.log("[ddc] seriesData:", seriesData);
+      console.log("[ddc] uniqueGroups:", uniqueGroups);
+
+      drawOrUpdateChart(seriesData, uniqueGroups);
+    }
+
+    if (window.addEventListener) {
+      window.addEventListener("message", onMessage, false);
+    } else {
+      window.attachEvent("onmessage", onMessage);
+    }
+
+    // Test data if no data arrives
+    setTimeout(function() {
+      if (typeof anychart !== 'undefined' && !document.querySelector('#container svg')) {
+        console.log("[ddc] No data received, testing with default data...");
+        let seriesData = {
+          'Sunday': [
+            { x: new Date('2021-01-01').getTime(), value: 10 },
+            { x: new Date('2021-01-02').getTime(), value: 12 },
+            { x: new Date('2021-01-03').getTime(), value: 14 }
+          ],
+          'Monday': [
+            { x: new Date('2021-01-01').getTime(), value: 15 },
+            { x: new Date('2021-01-02').getTime(), value: 18 },
+            { x: new Date('2021-01-03').getTime(), value: 20 }
+          ],
+          'Tuesday': [
+            { x: new Date('2021-01-01').getTime(), value: 20 },
+            { x: new Date('2021-01-02').getTime(), value: 22 },
+            { x: new Date('2021-01-03').getTime(), value: 25 }
+          ]
+        };
+        let uniqueGroups = ['Sunday', 'Monday', 'Tuesday'];
+        drawOrUpdateChart(seriesData, uniqueGroups);
+      }
+    }, 2000);
+  </script>
+</body>
+</html>
