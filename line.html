@@ -103,7 +103,7 @@
       chart.removeAllSeries();
 
       // Assign distinct colors and thickness to each line
-      var colors = ['#FF5733', '#33FF57', '#3357FF', '#FF33A6', '#FFC300', '#581845', '#DAF7A6'];
+      var colors = ['#FFB461', '#33FF57', '#3357FF', '#FF33A6', '#FFC300', '#581845', '#DAF7A6'];
 
       uniqueGroups.forEach(function(group, index) {
         var data = seriesData[group];
@@ -113,6 +113,11 @@
         var chosenColor = colors[index % colors.length];
         // Set visible stroke
         series.stroke({ color: chosenColor, thickness: 3, opacity: 0.9 });
+
+        // For all but the first series, start disabled so they're not clicked on by default
+        if (index > 0) {
+          series.enabled(false);
+        }
       });
 
       chart.draw();
