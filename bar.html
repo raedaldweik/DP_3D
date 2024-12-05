@@ -22,22 +22,12 @@
       position: relative;
       margin: auto;
     }
-    #overlay {
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      width: 100%;
-      height: 15%;
-      background-color: #2B2B2B; /* Match chart background */
-      z-index: 10; /* Ensure it overlays the chart */
-    }
+    /* Removed the overlay styles and element */
   </style>
 </head>
 <body>
-  <div id="container">
-    <!-- Overlay to hide the watermark -->
-    <div id="overlay"></div>
-  </div>
+  <div id="container"></div>
+
   <!-- Include AnyChart Libraries -->
   <script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js"></script>
   <script src="https://cdn.anychart.com/releases/v8/js/anychart-cartesian-3d.min.js"></script>
@@ -103,7 +93,7 @@
         // Set background color
         chart.background().fill('#2B2B2B'); // Set background color to match
 
-        // Make axis strokes white (if needed)
+        // Make axis strokes white
         chart.xAxis().stroke('#FFFFFF');
         chart.yAxis().stroke('#FFFFFF');
         chart.xAxis().ticks().stroke('#FFFFFF');
