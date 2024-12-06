@@ -49,10 +49,10 @@
 
         // Initial map view settings
         const initialView = {
-            center: [55.31766174258172, 25.222533164422202], // Initial center
-            zoom: 11.6, // Initial zoom level
-            pitch: 13.2, // Initial pitch
-            bearing: -36.6 // Initial bearing
+            center: [55.26054975714965, 25.099659223606594], // Initial center
+            zoom: 9.5, // Initial zoom level
+            pitch: 29.699999999999978, // Initial pitch
+            bearing: -47.000000000000455 // Initial bearing
         };
 
         // Create the map
@@ -75,7 +75,7 @@
                     // Smoothly zoom to the clicked point
                     map.flyTo({
                         center: coordinates,
-                        zoom: 15, // Adjust the zoom level as needed
+                        zoom: 15.4, // Adjust the zoom level as needed
                         essential: true
                     });
 
@@ -83,10 +83,11 @@
                     new mapboxgl.Popup()
                         .setLngLat(coordinates)
                         .setHTML(`
-                            <h3>Metadata</h3>
-                            <p><strong>Reporting Station:</strong> ${properties.reporting_station || 'N/A'}</p>
-                            <p><strong>Crime Type:</strong> ${properties.crime_type || 'N/A'}</p>
-                            <p><strong>Description:</strong> ${properties.description || 'N/A'}</p>
+                            <h3>Information</h3>
+                            <p><strong>Reporting Station:</strong> ${properties.report_id || 'N/A'}</p>
+                            <p><strong>Crime Type:</strong> ${properties.incident_datetime || 'N/A'}</p>
+                            <p><strong>Description:</strong> ${properties.latitude || 'N/A'}</p>
+                            <p><strong>Description:</strong> ${properties.longitude || 'N/A'}</p>
                         `)
                         .addTo(map);
                 }
@@ -118,10 +119,10 @@
         // Mapping of reporting stations to their locations
         const reportingStations = {
             'مركز شرطة الخوانيج': {
-                center: [55.3300, 25.2600],
-                zoom: 15,
-                pitch: 0,
-                bearing: 0
+                center: [55.48276499389439, 25.19577222103291],
+                zoom: 12.120446367520746,
+                pitch: 28.19999999999997,
+                bearing:-58.20000000000016
             },
             'مركز شرطة الفقة': {
                 center: [55.3400, 25.2700],
@@ -130,65 +131,65 @@
                 bearing: 0
             },
             'مركز شرطة البرشاء': {
-                center: [55.3500, 25.2800],
-                zoom: 15,
-                pitch: 0,
-                bearing: 0
+                center: [55.226738128138464, 25.065761198218013],
+                zoom: 11.145204120699242,
+                pitch: 7.196331158437165 ,
+                bearing: -146.91546989039284
             },
             // Add entries for other stations...
             'مركز شرطة الرفاعة': {
-                center: [55.3600, 25.2900],
-                zoom: 15,
-                pitch: 0,
+                center: [55.29700283111754, 25.25533867556281],
+                zoom: 14.409111227757448 ,
+                pitch: 34.25209977039998 ,
                 bearing: 0
             },
             'مركز شرطة بر دبي': {
-                center: [55.3700, 25.3000],
-                zoom: 15,
-                pitch: 0,
-                bearing: 0
+                center: [55.28690769271023, 25.19260917611156],
+                zoom: 12.185363433222772 ,
+                pitch: 26.236986515684176 ,
+                bearing: -86.34173884497852
             },
             'مركز شرطة القصيص': {
-                center: [55.3800, 25.3100],
-                zoom: 15,
-                pitch: 0,
-                bearing: 0
+                center: [55.3997653194468, 25.264607149810487],
+                zoom: 12.790368412199802 ,
+                pitch: 36.124137777181666,
+                bearing: 20.128182113475987
             },
             'مركز شرطة نايف': {
-                center: [55.3900, 25.3200],
-                zoom: 15,
-                pitch: 0,
-                bearing: 0
+                center: [55.3242611361637, 25.268517319704003],
+                zoom: 13.565708099797751 ,
+                pitch: 40.12413777718161 ,
+                bearing: -7.999999999999886
             },
             'مركز شرطة الراشدية': {
-                center: [55.4000, 25.3300],
-                zoom: 15,
-                pitch: 0,
-                bearing: 0
+                center: [55.39394476122439, 25.15368279828695],
+                zoom: 11.871442126728395 ,
+                pitch: 23.624137777181645 ,
+                bearing: -55.99999999999915
             },
             'مركز شرطة جبل علي': {
-                center: [55.4100, 25.3400],
-                zoom: 15,
-                pitch: 0,
-                bearing: 0
+                center: [55.13516912648291, 24.94585765760091],
+                zoom: 10.960743666361228 ,
+                pitch: 34.22292590303558 ,
+                bearing:  -136.80702493339265
             },
             'مركز شرطة ميناء دبي': {
-                center: [55.4200, 25.3500],
-                zoom: 15,
-                pitch: 0,
-                bearing: 0
+                center: [55.40786437253885, 25.246120133085967],
+                zoom: 11.98465385559356 ,
+                pitch: 34.22292590303558 ,
+                bearing: -136.80702493339265
             },
             'القيادة العامة لشرطة دبي': {
-                center: [55.4300, 25.3600],
-                zoom: 15,
-                pitch: 0,
-                bearing: 0
+                center: [55.39394476122439, 25.15368279828695],
+                zoom: 11.871442126728395 ,
+                pitch: 23.624137777181645 ,
+                bearing: -55.99999999999915
             },
             'مركز شرطة المرقبات': {
-                center: [55.4400, 25.3700],
-                zoom: 15,
-                pitch: 0,
-                bearing: 0
+                center: [55.39394476122439, 25.15368279828695],
+                zoom: 11.871442126728395 ,
+                pitch: 23.624137777181645 ,
+                bearing: -55.99999999999915
             }
         };
 
@@ -255,6 +256,15 @@
         } else {
             window.attachEvent("onmessage", onMessage);
         }
+
+        // Add code to log map's current coordinates, zoom, pitch, and bearing in the console
+        map.on('moveend', () => {
+            const center = map.getCenter();
+            console.log('Center:', center.lng, center.lat,
+                        'Zoom:', map.getZoom(),
+                        'Pitch:', map.getPitch(),
+                        'Bearing:', map.getBearing());
+        });
     </script>
 </body>
 </html>
