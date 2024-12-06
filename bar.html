@@ -12,7 +12,7 @@
       height: 100%;
       margin: 0;
       padding: 0;
-      background-color: #2B2B2B; /* Match chart background */
+      background-color: transparent; /* Match chart background */
     }
     #container {
       width: 100%;
@@ -91,7 +91,8 @@
         chart.yMinorGrid().enabled(false);
 
         // Set background color and remove any border
-        chart.background().fill('#2B2B2B').stroke(null).corners(0);
+        chart.background().fill('none').stroke(null).corners(0);
+
 
         // Remove axis strokes and ticks for no borders
         chart.xAxis().stroke(null);
