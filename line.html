@@ -20,29 +20,18 @@
       padding: 0;
       background-color: #2B2B2B; /* Dark background */
     }
-    #overlay {
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      width: 100%;
-      height: 15%;
-      background-color: #2B2B2B; /* Match chart background */
-      z-index: 10; /* Ensure it overlays the chart to hide watermark */
-    }
+    /* Removed the overlay entirely */
   </style>
 </head>
 <body>
-  <div id="container">
-    <!-- Overlay to hide the watermark -->
-    <div id="overlay"></div>
-  </div>
+  <div id="container"></div>
 
   <script>
     var chart;
 
     function drawOrUpdateChart(seriesData, uniqueGroups) {
       if (!chart) {
-        anychart.theme('lightBlue');
+        anychart.theme('light_blue');
 
         chart = anychart.line3d();
         chart.animation(true);
@@ -63,7 +52,7 @@
 
         // Legend
         chart.legend().enabled(true).fontSize(13).padding([0, 0, 20, 0]);
-        // Make legend text white as well
+        // Make legend text white
         chart.legend().fontColor('#FFFFFF');
 
         // 3D settings
@@ -80,10 +69,16 @@
         });
 
         // Background and grid
-        chart.background().fill('#2B2B2B');
+        chart.background().fill('#2B2B2B').stroke(null).corners(0);
         chart.xGrid().enabled(false);
         chart.yGrid().enabled(false);
         chart.yMinorGrid().enabled(false);
+
+        // If plot background is available, unify it too
+        // This ensures no internal border differs from background
+        if (chart.plot) {
+          chart.plot().background().fill('#2B2B2B').stroke(null);
+        }
 
         // Axis labels white
         chart.xAxis().labels().fontColor('#FFFFFF');
@@ -114,7 +109,7 @@
         // Set visible stroke
         series.stroke({ color: chosenColor, thickness: 3, opacity: 0.9 });
 
-        // For all but the first series, start disabled so they're not clicked on by default
+        // For all but the first series, start disabled so they're not all clicked on by default
         if (index > 0) {
           series.enabled(false);
         }
