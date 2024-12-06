@@ -22,7 +22,7 @@
       position: relative;
       margin: auto;
     }
-    /* Removed the overlay styles and element */
+    /* Removed the overlay entirely */
   </style>
 </head>
 <body>
@@ -66,7 +66,7 @@
         // Set scale minimum
         chart.yScale().minimum(0);
 
-        // Set yAxis labels formatter
+        // Set yAxis labels formatter and color
         chart.yAxis().labels().format('{%Value}{groupsSeparator: }');
         chart.yAxis().labels().fontColor('#FFFFFF'); // Y-axis labels white
 
@@ -90,14 +90,14 @@
         chart.yGrid().enabled(false);
         chart.yMinorGrid().enabled(false);
 
-        // Set background color
-        chart.background().fill('#2B2B2B'); // Set background color to match
+        // Set background color and remove any border
+        chart.background().fill('#2B2B2B').stroke(null).corners(0);
 
-        // Make axis strokes white
-        chart.xAxis().stroke('#FFFFFF');
-        chart.yAxis().stroke('#FFFFFF');
-        chart.xAxis().ticks().stroke('#FFFFFF');
-        chart.yAxis().ticks().stroke('#FFFFFF');
+        // Remove axis strokes and ticks for no borders
+        chart.xAxis().stroke(null);
+        chart.yAxis().stroke(null);
+        chart.xAxis().ticks().stroke(null);
+        chart.yAxis().ticks().stroke(null);
 
         // Set container id for the chart
         chart.container('container');
