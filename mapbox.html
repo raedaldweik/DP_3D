@@ -84,10 +84,10 @@
                         .setLngLat(coordinates)
                         .setHTML(`
                             <h3>Information</h3>
-                            <p><strong>Reporting Station:</strong> ${properties.report_id || 'N/A'}</p>
-                            <p><strong>Crime Type:</strong> ${properties.incident_datetime || 'N/A'}</p>
-                            <p><strong>Description:</strong> ${properties.latitude || 'N/A'}</p>
-                            <p><strong>Description:</strong> ${properties.longitude || 'N/A'}</p>
+                            <p><strong>Report ID:</strong> ${properties.report_id || 'N/A'}</p>
+                            <p><strong>Incident Date:</strong> ${properties.incident_datetime || 'N/A'}</p>
+                            <p><strong>Latitude:</strong> ${properties.latitude || 'N/A'}</p>
+                            <p><strong>Longitude:</strong> ${properties.longitude || 'N/A'}</p>
                         `)
                         .addTo(map);
                 }
