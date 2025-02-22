@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Info Card</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: transparent; /* Makes background transparent */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            padding: 20px;
+            text-align: left;
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #0D47A1;
+        }
+        .icon {
+            width: 40px;
+            height: 40px;
+            background-color: #0D47A1;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 5px;
+            font-size: 24px;
+        }
+        .divider {
+            border-bottom: 2px solid #ddd;
+            margin: 10px 0;
+        }
+        .info {
+            font-size: 14px;
+            color: #444;
+        }
+        .bold {
+            font-weight: bold;
+            color: black;
+        }
+    </style>
+    <script>
+        function updateCard(data) {
+            document.getElementById('trafficNo').innerText = data.TRAFFIC_NO || "N/A";
+            document.getElementById('age').innerText = data.AGE ? data.AGE + " YEARS" : "N/A";
+            document.getElementById('idNumber').innerText = data.ACD_ID || "N/A";
+            document.getElementById('nationality').innerText = data.NATIONALITY || "N/A";
+            document.getElementById('dlIssuance').innerText = data.DRIVING_LICENSE_ISSUE_DATE || "N/A";
+            document.getElementById('carModel').innerText = data.MODEL_NAME || "N/A";
+        }
+
+        // Function to receive SAS VA Data-Driven Content messages
+        function onMessage(evt) {
+            console.log("[DDC] Received event:", evt);
+
+            if (!evt.data) {
+                console.warn("[DDC] No event data received.");
+                return;
+            }
+
+            let sasData = evt.data;
+
+            console.log("[DDC] Raw Data:", JSON.stringify(sasData, null, 2));
+
+            if (!sasData.data || sasData.data.length === 0) {
+                console.warn("[DDC] No valid data received from SAS.");
+                return;
+            }
+
+            let rowData = sasData.data[0]; // First row of data
+            let columnMapping = sasData.columns; // Column names from SAS VA
+
+            console.log("[DDC] Column Mapping:", columnMapping);
+            console.log("[DDC] Row Data:", rowData);
+
+            if (!columnMapping || columnMapping.length === 0) {
+                console.error("[DDC] No column mapping received.");
+                return;
+            }
+
+            // Convert SAS Data to JSON object
+            let formattedData = {};
+            columnMapping.forEach((col, index) => {
+                formattedData[col] = rowData[index]; // Assign each column value
+            });
+
+            console.log("[DDC] Parsed Data:", formattedData);
+
+            // Update the card
+            updateCard(formattedData);
+        }
+
+        // Listen for messages from SAS VA
+        if (window.addEventListener) {
+            window.addEventListener("message", onMessage, false);
+        } else {
+            window.attachEvent("onmessage", onMessage);
+        }
+    </script>
+</head>
+<body>
+    <div class="card">
+        <div class="card-header">
+            <div class="icon">🆔</div>
+            <span id="trafficNo">TRAFFIC FILE NO</span>
+        </div>
+        <div class="divider"></div>
+        <p class="info"><span class="bold" id="age">AGE</span> | ID: <span class="bold" id="idNumber">ACD_ID</span></p>
+        <p class="info">Nationality: <span class="bold" id="nationality">NATIONALITY</span></p>
+        <p class="info">DL Issuance: <span class="bold" id="dlIssuance">DRIVING LICENSE ISSUE DATE</span></p>
+        <p class="info">Car Model: <span class="bold" id="carModel">MODEL NAME</span></p>
+    </div>
+</body>
+</html>
